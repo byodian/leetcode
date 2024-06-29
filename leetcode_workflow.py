@@ -204,6 +204,90 @@ def create_template(problem, language):
     print(template_body)
     return template_header + '\n' + template_body
 
+def create_file_name_1(title_slug, language) -> dict[str, str]:
+    file_ext = language
+    # two-slug -> two_slug
+    filename = title_slug.replace("-", "_")
+    test_filename = filename
+    if language == "cpp":
+        file_ext = "cpp"
+        test_filename = test_filename + "_test"
+    elif language == "bash":
+        file_ext = "sh"
+        test_filename = "test_" + test_filename
+    elif language == "javascript":
+        file_ext = "js"
+        filename = title_slug
+        test_filename = test_filename + ".test"
+    elif language == "typescript":
+        file_ext = "ts"
+        filename = title_slug
+        test_filename = test_filename + ".test"
+    elif language == "python3":
+        file_ext = "py"
+        test_filename = "test_" + test_filename
+    elif language == "mysql":
+        file_ext = "sql"
+        test_filename = "test_" + test_filename
+    elif language == "postgresql":
+        file_ext = "sql"
+        test_filename = "test_" + test_filename
+    elif language == "java":
+        file_ext = "java"
+        #title = "".join(word.capitalize() for word in title_slug.split("-"))
+        filename = "".join(map(str.capitalize, title_slug.split("-")))
+        test_filename = filename + "Test"
+    elif language == "golang":
+        file_ext = "sql"
+        test_filename = test_filename + "_test"
+
+    return { "test_filename": f'{filename}.{file_ext}', "filename": f'{filename}.{file_ext}' }
+
+def create_file_name(title_slug, language) -> dict[str, str]:
+    def to_camel_case(title_slug):
+        return "".join(map(str.capitalize, title_slug.split("-")))
+    
+    file_extensions = {
+        "javascript": "js",
+        "typescript": "ts",
+        "python3": "py",
+        "java": "java",
+        "cpp": "cpp",
+        "golang": "go",
+        "mysql": "sql",
+        "postgresql": "sql",
+        "bash": "sh"
+    }
+
+    test_filename_prefixes = {
+        "bash": "test_",
+        "python3": "test_",
+        "mysql": "test_",
+        "postgresql": "test_",
+    }
+
+    test_filename_suffixes = {
+        "cpp": "_test",
+        "golang": "_test",
+        "javascript": ".test",
+        "typescript": ".test",
+        "java": "Test"
+    }
+
+    filename = title_slug.replace("-", "_")
+    if language in { "javascript", "typescript"}:
+        filename = title_slug
+    elif language == "java":
+        filename = to_camel_case(title_slug)
+
+    test_filename = test_filename_prefixes.get(language, "") + filename + test_filename_suffixes.get(language, "")
+    file_ext = file_extensions.get(language)
+
+    return {
+        "filename": f'{filename}.{file_ext}',
+        "test_filename": f'{test_filename}.{file_ext}'
+    }
+
 
 def save_problem(language, title_slug):
     if language not in languages:
@@ -220,32 +304,17 @@ def save_problem(language, title_slug):
 
     # Create template for the specified language
     template = create_template(problem, language)
+    filename_dict = create_file_name(title_slug, language)
 
     if template:
-        file_ext = language
-        if language == "cpp":
-            file_ext = "cpp"
-        elif language == "bash":
-            file_ext = "sh"
-        elif language == "javascript":
-            file_ext = "js"
-        elif language == "typescript":
-            file_ext = "ts"
-        elif language == "python3":
-            file_ext = "py"
-        elif language == "mysql":
-            file_ext = "sql"
-        elif language == "postgresql":
-            file_ext = "sql"
-        elif language == "java":
-            file_ext = "java"
-        elif language == "golang":
-            file_ext = "sql"
-
-        file_path = os.path.join(problem_dir, f"{title_slug}.{file_ext}")
+        file_path = os.path.join(problem_dir, filename_dict.get("filename", ""))
         with open(file_path, "w") as f:
             f.write(template)
 
+        test_file_path = os.path.join(problem_dir, filename_dict.get("test_filename", ""))
+        with open(test_file_path, "w") as f:
+            f.write("")
+            
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
