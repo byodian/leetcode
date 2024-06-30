@@ -84,9 +84,12 @@ comment_symbols = {
     "bash": "#",
 }
 
-languages = ["javascript", "typescript", "python3", "java", "cpp", "golang", "mysql", "postgresql", "bash"]
+languages = ["javascript", "typescript", "python3",
+             "java", "cpp", "golang", "mysql", "postgresql", "bash"]
 
 # Headers for the request
+
+
 def get_headers(title_slug):
     return {
         'Origin': 'https://leetcode.com',
@@ -114,12 +117,14 @@ def fetch_problem(title_slug):
     }
 
     # Make the request
-    response = requests.post(API_URL, json=payload, headers=get_headers(title_slug))
+    response = requests.post(API_URL, json=payload,
+                             headers=get_headers(title_slug))
     return response.json()["data"]["question"]
 
 
 def create_template_header(problem, comment_symbol):
-    hints = '\n'.join(f' {comment_symbol} {hint}' for hint in problem.get('hints', []))
+    hints = '\n'.join(f' {comment_symbol} {
+                      hint}' for hint in problem.get('hints', []))
     topic_tags = ', '.join(tag['name'] for tag in problem.get('topicTags', []))
 
     template_headers = {
@@ -131,11 +136,11 @@ def create_template_header(problem, comment_symbol):
  * Likes: {problem['likes']}
  * Dislikes: {problem['dislikes']}
  * Topic Tags: {topic_tags}
- * 
+ *
  * Problem description:
 {html_to_text(problem['content'], "*")}
  *
- * Hints: 
+ * Hints:
 {hints}
  */
 """,
@@ -150,7 +155,7 @@ def create_template_header(problem, comment_symbol):
 # Problem description:
 # {html_to_text(problem['content'], "#")}
 #
-# Hints: 
+# Hints:
 {hints}
 """,
         "--": f"""
@@ -164,7 +169,7 @@ def create_template_header(problem, comment_symbol):
 -- Problem description:
 -- {html_to_text(problem['content'], "--")}
 --
--- Hints: 
+-- Hints:
 {hints}
 """
     }
@@ -189,7 +194,8 @@ def html_to_text(html_content, comment_symbol="*", content_type="header"):
     commented_text = ""
 
     if (content_type == "header"):
-        commented_text = '\n'.join(f' {comment_symbol} {line}' for line in lines)
+        commented_text = '\n'.join(
+            f' {comment_symbol} {line}' for line in lines)
     else:
         commented_text = '\n'.join(f'{line}' for line in lines)
 
@@ -198,55 +204,18 @@ def html_to_text(html_content, comment_symbol="*", content_type="header"):
 
 def create_template(problem, language):
     # Define templates for different languages
-    template_header = create_template_header(problem, comment_symbols.get(language))
+    template_header = create_template_header(
+        problem, comment_symbols.get(language))
     print(template_header)
     template_body = create_template_body(problem, language)
     print(template_body)
     return template_header + '\n' + template_body
 
-def create_file_name_1(title_slug, language) -> dict[str, str]:
-    file_ext = language
-    # two-slug -> two_slug
-    filename = title_slug.replace("-", "_")
-    test_filename = filename
-    if language == "cpp":
-        file_ext = "cpp"
-        test_filename = test_filename + "_test"
-    elif language == "bash":
-        file_ext = "sh"
-        test_filename = "test_" + test_filename
-    elif language == "javascript":
-        file_ext = "js"
-        filename = title_slug
-        test_filename = test_filename + ".test"
-    elif language == "typescript":
-        file_ext = "ts"
-        filename = title_slug
-        test_filename = test_filename + ".test"
-    elif language == "python3":
-        file_ext = "py"
-        test_filename = "test_" + test_filename
-    elif language == "mysql":
-        file_ext = "sql"
-        test_filename = "test_" + test_filename
-    elif language == "postgresql":
-        file_ext = "sql"
-        test_filename = "test_" + test_filename
-    elif language == "java":
-        file_ext = "java"
-        #title = "".join(word.capitalize() for word in title_slug.split("-"))
-        filename = "".join(map(str.capitalize, title_slug.split("-")))
-        test_filename = filename + "Test"
-    elif language == "golang":
-        file_ext = "sql"
-        test_filename = test_filename + "_test"
-
-    return { "test_filename": f'{filename}.{file_ext}', "filename": f'{filename}.{file_ext}' }
 
 def create_file_name(title_slug, language) -> dict[str, str]:
     def to_camel_case(title_slug):
         return "".join(map(str.capitalize, title_slug.split("-")))
-    
+
     file_extensions = {
         "javascript": "js",
         "typescript": "ts",
@@ -275,12 +244,13 @@ def create_file_name(title_slug, language) -> dict[str, str]:
     }
 
     filename = title_slug.replace("-", "_")
-    if language in { "javascript", "typescript"}:
+    if language in {"javascript", "typescript"}:
         filename = title_slug
     elif language == "java":
         filename = to_camel_case(title_slug)
 
-    test_filename = test_filename_prefixes.get(language, "") + filename + test_filename_suffixes.get(language, "")
+    test_filename = test_filename_prefixes.get(
+        language, "") + filename + test_filename_suffixes.get(language, "")
     file_ext = file_extensions.get(language)
 
     return {
@@ -299,7 +269,14 @@ def save_problem(language, title_slug):
     problem = fetch_problem(title_slug)
 
     # Create directory for the problem
-    problem_dir = os.path.join(BASE_DIR, language, title_slug)
+    if (language == "java" or language == "cpp" or language == "golang"):
+        problem_dir = os.path.join(
+            BASE_DIR, language, "src", title_slug.replace("-", ""))
+    elif (language == "typescript" or language == "javascript"):
+        problem_dir = os.path.join(BASE_DIR, language, "src", title_slug)
+    else:
+        problem_dir = os.path.join(BASE_DIR, language, title_slug)
+
     os.makedirs(problem_dir, exist_ok=True)
 
     # Create template for the specified language
@@ -307,14 +284,16 @@ def save_problem(language, title_slug):
     filename_dict = create_file_name(title_slug, language)
 
     if template:
-        file_path = os.path.join(problem_dir, filename_dict.get("filename", ""))
+        file_path = os.path.join(
+            problem_dir, filename_dict.get("filename", ""))
         with open(file_path, "w") as f:
             f.write(template)
 
-        test_file_path = os.path.join(problem_dir, filename_dict.get("test_filename", ""))
+        test_file_path = os.path.join(
+            problem_dir, filename_dict.get("test_filename", ""))
         with open(test_file_path, "w") as f:
             f.write("")
-            
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

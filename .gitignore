@@ -1,2 +1,28 @@
+# Java stuff
 .idea
 *.class
+# Ignore Gradle project-specific cache directory
+.gradle
+out/
+
+# Ignore Gradle build output directory
+build
+
+# Python stuff
+__pycache__/
+venv/
+env/
+env.bak/
+venv.bak/
+
+# Go stuff
+
+# Node stuff
+node_modules/
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
