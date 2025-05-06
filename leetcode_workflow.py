@@ -79,13 +79,14 @@ comment_symbols = {
     "java": "*",
     "cpp": "*",
     "golang": "*",
+    "c": "*",
     "mysql": "--",
     "postgresql": "--",
     "bash": "#",
 }
 
 languages = ["javascript", "typescript", "python3",
-             "java", "cpp", "golang", "mysql", "postgresql", "bash"]
+             "java", "cpp", "golang", "mysql", "postgresql", "bash", "c"]
 
 # Headers for the request
 
@@ -225,7 +226,8 @@ def create_file_name(title_slug, language) -> dict[str, str]:
         "golang": "go",
         "mysql": "sql",
         "postgresql": "sql",
-        "bash": "sh"
+        "bash": "sh",
+        "c": "c"
     }
 
     test_filename_prefixes = {
@@ -233,6 +235,7 @@ def create_file_name(title_slug, language) -> dict[str, str]:
         "python3": "test_",
         "mysql": "test_",
         "postgresql": "test_",
+        "c": "test_",
     }
 
     test_filename_suffixes = {
