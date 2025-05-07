@@ -28,7 +28,4 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 #c/cpp
-algorithms/c/*
-!algorithms/c/**/
-!algorithms/c/**/*.c
-!algorithms/c/**/*.h
+*.out

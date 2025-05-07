@@ -21,5 +21,12 @@ int main() {
   myLinkedListAddAtTail(list, 4);
   printList(list);
 
+  MyLinkedList* list2 = myLinkedListCreate();
+  myLinkedListAddAtTail(list2, 4);
+  myLinkedListAddAtHead(list2, 3);
+  printList(list2);
+  printf("Value at index 1: %d\n", myLinkedListGet(list2, 1));
+  printf("Value at index 2: %d\n", myLinkedListGet(list2, 2));
+
   return 0;
 }

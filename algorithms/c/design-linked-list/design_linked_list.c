@@ -75,53 +75,65 @@ MyLinkedList* myLinkedListCreate() {
 }
 
 int myLinkedListGet(MyLinkedList* obj, int index) {
-  if (obj == NULL) {
+  if (!obj->head) {
     return -1;
   }
 
-  Node* head = obj->head;
   if (index == 0) {
-    if (head != NULL) {
-      return head->val;
+    if (obj->head) return obj->head->val;
+    return -1;
+  } else if (index > 0) {
+    // for(int i = 1; i < index; i++) {
+    //   if (current->next) {
+    //     current = current->next;
+    //   } else {
+    //     return -1;
+    //   }
+    // }
+    // if (current->next) {
+    //   return current->next->val;
+    // } else {
+    //   return -1;
+    // }
+    int i = 1;
+    Node* current = obj->head;
+    while(current->next) {
+      if (i == index) {
+        return current->next->val;
+      }
+      i = i + 1;
+      current = current->next;
     }
     return -1;
+  } else {
+    return -1;
   }
-
-  int curIndex = 1;
-  Node* current = head;
-  while(current->next != NULL) {
-    if (curIndex == index) {
-      return current->next->val;
-    }
-    curIndex = curIndex + 1;
-    current = current->next;
-  }
-  return -1;
 }
 
 void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
-  if (obj == NULL) {
+  if (!obj->head) {
+    obj->head = createNode(val);
     return;
   }
 
-  Node* head = obj->head;
+  // head->oldnode->...
+  // head->newnode->oldnode->...
+  Node* tmp = obj->head;
   Node* newnode = createNode(val);
-  newnode->next = head;
   obj->head = newnode;
+  newnode->next = tmp;
 }
 
 void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
-  if (obj == NULL) {
-    return;
+  if (!obj->head) {
+    return myLinkedListAddAtHead(obj, val);
   }
 
-  Node* head = obj->head;
-  Node* current = head;
-  while(current->next != NULL) {
+  Node* current = obj->head;
+  while(current->next) {
     current = current->next;
   }
-  Node* newnode = createNode(val);
-  current->next = newnode;
+  current->next = createNode(val);
 }
 
 void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
