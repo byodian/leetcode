@@ -137,53 +137,66 @@ void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
 }
 
 void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
-  if (obj == NULL) {
-    return;
-  }
-  Node* head = obj->head;
-  Node* newnode = createNode(val);
-  if (index == 0) {
-    newnode->next = head;
-    obj->head = newnode;
-    return;
-  }
-
-  Node* current = head;
-  int currentIndex = 1;
-  while(current->next != NULL) {
-    if (currentIndex == index) {
-      newnode->next = current->next;
-      current->next = newnode;
-      return;
+  if (!obj->head) {
+    if (index == 0) {
+      myLinkedListAddAtHead(obj, val);
     }
-    current = current->next;
-    currentIndex = currentIndex + 1;
+  } else {
+    Node* current = obj->head;
+    Node* tmp;
+    if (index == 0) {
+      tmp = obj->head;
+      Node* newnode = createNode(val);
+      obj->head = newnode;
+      newnode->next = tmp;
+    } else if (index > 0) {
+      Node* current = obj->head;
+      for (int i = 1; i < index; i++) {
+        if (current->next) {
+          current = current->next;
+        } else {
+          return;
+        }
+      }
+
+      // current (node at index "index - 1")
+      // current->next (node at index "index")
+      tmp = current->next;
+      Node* newnode = createNode(val);
+      current->next = newnode;
+      newnode->next = tmp;
+    }
   }
 }
 
 void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
-  if (obj == NULL) {
+  if (!obj->head) {
     return;
   }
 
-  Node* head = obj->head;
+  Node* current = obj->head;
+  Node* tmp;
   if (index == 0) {
-    obj->head = head->next;
-    free(head);
-    return;
-  }
-
-  Node* current = head;
-  int currentIndex = 1;
-  while(current->next != NULL) {
-    Node* temp = current->next;
-    if (currentIndex == index) {
-      current->next = temp->next;
-      free(temp);
-      return;
+    tmp = obj->head;
+    obj->head = current->next;
+    free(tmp);
+  } else if (index >0) {
+    int currentIndex = 1;
+    for (int i = 1; i < index; i++) {
+      if (current->next) {
+        current = current->next;
+      } else {
+        return;
+      }
     }
-    current = current->next;
-    currentIndex = currentIndex + 1;
+
+    // current (index - 1)
+    // current->next (index)
+    tmp = current->next;
+    if (tmp) {
+      current->next = tmp->next;
+      free(tmp);
+    }
   }
 }
 
