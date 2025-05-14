@@ -56,51 +56,32 @@ struct ListNode {
     struct ListNode *next;
 };
 
-static struct ListNode* createNode(int val) {
+/**
+ * helper functions
+ */
+
+struct ListNode* createNode(int val) {
   struct ListNode* newnode = malloc(sizeof(struct ListNode));
   newnode->next = NULL;
   newnode->val = val;
   return newnode;
 }
 
-static void addAtHead(struct ListNode** head, int val) {
+void addAtHead(struct ListNode** head, int val) {
   struct ListNode* tmp = *head;
   struct ListNode* newnode = createNode(val);
   newnode->next = tmp;
   *head = newnode;
 }
 
-static struct ListNode* addAtHead2(struct ListNode* head, int val) {
+struct ListNode* addAtHead2(struct ListNode* head, int val) {
   struct ListNode* tmp = head;
   struct ListNode* newnode = createNode(val);
   newnode->next = tmp;
   return newnode;
 }
 
-struct ListNode* reverseList(struct ListNode* head) {
-  if (!head) return NULL;
-  
-  struct ListNode* current = head;
-  struct ListNode* reverseHead = createNode(head->val);
-  while(current->next) {
-    addAtHead(&reverseHead, current->next->val);
-
-    current = current->next;
-  }
-
-  return reverseHead;
-}
-
-static struct ListNode* createListNodes(int length) {
-
-  struct ListNode* head = createNode(0);
-  for (int i = 1; i < length; i++) {
-    addAtHead(&head, i);
-  }
-  return head;
-}
-
-static void printList(struct ListNode* head) {
+void printList(struct ListNode* head) {
   if (head) {
     struct ListNode* current = head;
     while(current) {
@@ -111,23 +92,87 @@ static void printList(struct ListNode* head) {
   printf("\n");  
 }
 
-static struct ListNode* reverseList2(struct ListNode* head) {
-  if (head == NULL || head->next == NULL) return head;
-  return NULL;
+struct ListNode* deepCopy(struct ListNode* head) {
+  struct ListNode* new_head = NULL;
+  struct ListNode* new_tail = NULL;
+  struct ListNode* cur = head;
+  while(cur != NULL) {
+    // 分配新节点
+    struct ListNode* new_node = malloc(sizeof(struct ListNode));
+    new_node->val = cur->val;
+    new_node->next = NULL;
+    // 尾插法构建新链表
+    if (new_head == NULL) {
+      new_head = new_node;
+      new_tail = new_node;
+    } else {
+      new_tail->next = new_node;
+      new_tail = new_node;
+    }
+
+    cur = cur->next;
+  }
+
+  return new_head;
 }
 
-void changeHeadNext(struct ListNode* head) {
-  head->next = NULL;
+/**
+ * helper functions end
+ ****************************************** 
+ */
+
+struct ListNode* reverseList(struct ListNode* head) {
+  if (!head) return head;
+  
+  struct ListNode* current = head;
+  struct ListNode* reverse_head = NULL;
+  // 重新分配内存+头插法
+  while(current) {
+    struct ListNode* new_node = malloc(sizeof(struct ListNode));
+    new_node->val = current->val;
+    new_node->next = reverse_head;
+    reverse_head = new_node;
+    current = current->next;
+  }
+
+  return reverse_head;
 }
+
+// 这种方法会修改外部head变量， 导致 head->next 指针指向 NULL
+struct ListNode* reverseList2(struct ListNode* head) {
+  if (head == NULL || head->next == NULL) return head;
+
+  struct ListNode* cur = head;
+  struct ListNode* prev = NULL;
+  while(cur != NULL) {
+    struct ListNode* next_node = cur->next;
+    cur->next = prev;
+    prev = cur;
+    cur = next_node;
+  }
+  return prev;
+}
+
+/**
+ * test cases
+ */
 
 int main() {
-  struct ListNode* head = createListNodes(5);
+  struct ListNode* head = NULL;
+  for (int i = 0; i < 5; i++) {
+    addAtHead(&head, i);
+  }
   head = addAtHead2(head, 5);
-  changeHeadNext(head);
   printList(head);
 
-  // struct ListNode* reverseHead = reverseList(head);
-  // printList(reverseHead);
+  struct ListNode* reverseHead = reverseList(head);
+  printList(reverseHead);
+
+  struct ListNode* reverseHead2 = reverseList2(deepCopy(head));
+  printList(reverseHead2);
+
+  // head 指向的值没有被修改
+  printList(head);
 
   return 0;
 }
