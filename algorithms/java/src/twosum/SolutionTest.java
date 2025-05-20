@@ -3,7 +3,7 @@ package twosum;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
-public class TwoSumTest {
+public class SolutionTest {
 
     @Test
     public void should_find_target() {
